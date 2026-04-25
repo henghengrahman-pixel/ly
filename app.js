@@ -7,6 +7,7 @@ const fs = require('fs-extra');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
 const BASE_DIR = __dirname;
 const DATA_DIR = path.resolve(BASE_DIR, process.env.DATA_DIR || 'data');
 const CONFIG_FILE = path.join(DATA_DIR, 'config.json');
@@ -15,27 +16,44 @@ const ADMIN_ID = process.env.ADMIN_ID || 'admin';
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'admin123';
 const SESSION_SECRET = process.env.SESSION_SECRET || 'change-this-secret-now';
 
+
+// ✅ FIX CONFIG (SUDAH SINKRON DENGAN EJS)
 const DEFAULT_CONFIG = {
   siteTitle: 'CUSTOMER SERVICE OMTOGEL',
   profileAlt: 'CS OMTOGEL',
   profilePhoto: 'https://i.postimg.cc/DZM5NWbq/omcs.png',
-  backgroundDesktop: '',
-  backgroundMobile: '',
+
+  background: '',
+  background_mobile: '',
+
   wa1: 'https://wa.me/6280000000001',
   wa2: 'https://wa.me/6280000000002',
   wa3: 'https://wa.me/6280000000003',
+
   tg1: 'https://t.me/username1',
   tg2: 'https://t.me/username2',
+
   lc1: '#',
   lc2: '#'
 };
+
+
+// =========================
+// HELPER
+// =========================
 
 function clean(value) {
   return String(value || '').trim();
 }
 
+
+// =========================
+// CONFIG FILE
+// =========================
+
 async function ensureConfig() {
   await fs.ensureDir(DATA_DIR);
+
   if (!(await fs.pathExists(CONFIG_FILE))) {
     await fs.writeJson(CONFIG_FILE, DEFAULT_CONFIG, { spaces: 2 });
   }
@@ -43,30 +61,65 @@ async function ensureConfig() {
 
 async function readConfig() {
   await ensureConfig();
+
   const data = await fs.readJson(CONFIG_FILE).catch(() => ({}));
-  return { ...DEFAULT_CONFIG, ...data };
+
+  const merged = { ...DEFAULT_CONFIG, ...data };
+
+  // 🔥 AUTO FIX kalau mobile kosong
+  if (!merged.background_mobile) {
+    merged.background_mobile = merged.background;
+  }
+
+  return merged;
 }
 
 async function saveConfig(body) {
   const next = {};
+
   for (const key of Object.keys(DEFAULT_CONFIG)) {
     next[key] = clean(body[key]);
   }
+
+  // 🔥 AUTO FALLBACK
+  if (!next.background_mobile) {
+    next.background_mobile = next.background;
+  }
+
   await fs.writeJson(CONFIG_FILE, next, { spaces: 2 });
   return next;
 }
+
+
+// =========================
+// AUTH
+// =========================
 
 function requireLogin(req, res, next) {
   if (req.session && req.session.isAdmin === true) return next();
   return res.redirect('/admin/login');
 }
 
+
+// =========================
+// SETUP
+// =========================
+
 app.set('trust proxy', 1);
 app.set('view engine', 'ejs');
 app.set('views', path.join(BASE_DIR, 'views'));
-app.use(express.urlencoded({ extended: true, limit: '1mb' }));
-app.use(express.json({ limit: '1mb' }));
-app.use(express.static(path.join(BASE_DIR, 'public'), { maxAge: '7d' }));
+
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+
+// 🔥 NO CACHE (BIAR BACKGROUND LANGSUNG UPDATE)
+app.use((req, res, next) => {
+  res.setHeader('Cache-Control', 'no-store');
+  next();
+});
+
+app.use(express.static(path.join(BASE_DIR, 'public')));
+
 app.use(session({
   name: 'livechat.sid',
   secret: SESSION_SECRET,
@@ -80,6 +133,12 @@ app.use(session({
   }
 }));
 
+
+// =========================
+// ROUTES
+// =========================
+
+// HOME
 app.get('/', async (req, res, next) => {
   try {
     const config = await readConfig();
@@ -89,30 +148,43 @@ app.get('/', async (req, res, next) => {
   }
 });
 
+// ADMIN
 app.get('/admin', requireLogin, async (req, res, next) => {
   try {
     const config = await readConfig();
-    res.render('dashboard', { config, success: req.query.success === '1', error: '' });
+    res.render('dashboard', {
+      config,
+      success: req.query.success === '1',
+      error: ''
+    });
   } catch (err) {
     next(err);
   }
 });
 
+// LOGIN
 app.get('/admin/login', (req, res) => {
-  if (req.session && req.session.isAdmin === true) return res.redirect('/admin');
+  if (req.session && req.session.isAdmin === true) {
+    return res.redirect('/admin');
+  }
   res.render('login', { error: '' });
 });
 
 app.post('/admin/login', (req, res) => {
   const userId = clean(req.body.userId);
   const password = clean(req.body.password);
+
   if (userId === ADMIN_ID && password === ADMIN_PASSWORD) {
     req.session.isAdmin = true;
     return res.redirect('/admin');
   }
-  return res.status(401).render('login', { error: 'User ID atau password salah.' });
+
+  return res.status(401).render('login', {
+    error: 'User ID atau password salah.'
+  });
 });
 
+// SAVE CONFIG
 app.post('/admin/save', requireLogin, async (req, res, next) => {
   try {
     await saveConfig(req.body);
@@ -122,9 +194,15 @@ app.post('/admin/save', requireLogin, async (req, res, next) => {
   }
 });
 
+// LOGOUT
 app.post('/admin/logout', requireLogin, (req, res) => {
   req.session.destroy(() => res.redirect('/admin/login'));
 });
+
+
+// =========================
+// ERROR
+// =========================
 
 app.use((req, res) => {
   res.status(404).send('404 - Halaman tidak ditemukan');
@@ -135,9 +213,16 @@ app.use((err, req, res, next) => {
   res.status(500).send('500 - Server error. Cek log Railway.');
 });
 
+
+// =========================
+// START
+// =========================
+
 ensureConfig().then(() => {
-  app.listen(PORT, () => console.log(`RUNNING ON PORT ${PORT}`));
-}).catch((err) => {
+  app.listen(PORT, () => {
+    console.log(`RUNNING ON PORT ${PORT}`);
+  });
+}).catch(err => {
   console.error('Gagal membuat data dir:', err);
   process.exit(1);
 });
