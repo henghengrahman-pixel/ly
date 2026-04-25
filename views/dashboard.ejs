@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard Admin</title>
+  <link rel="icon" type="image/png" href="/favicon.png">
+  <style>
+    *{box-sizing:border-box}body{margin:0;background:#020617;color:#e5e7eb;font-family:Arial,sans-serif;padding:22px}.top{max-width:1100px;margin:0 auto 18px;display:flex;justify-content:space-between;gap:12px;align-items:center}.top h1{margin:0}.actions{display:flex;gap:10px;align-items:center}.btn,a.btn{border:0;border-radius:12px;padding:11px 15px;background:#f97316;color:#fff;font-weight:800;text-decoration:none;cursor:pointer}.btn.gray{background:#334155}.card{max-width:1100px;margin:0 auto;background:#0f172a;border:1px solid #1e293b;border-radius:22px;padding:22px;box-shadow:0 18px 50px rgba(0,0,0,.35)}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}@media(max-width:760px){.grid{grid-template-columns:1fr}.top{display:block}.actions{margin-top:14px;flex-wrap:wrap}}label{display:block;font-weight:800;margin-bottom:7px;color:#f8fafc}input{width:100%;padding:13px 14px;border-radius:12px;border:1px solid #334155;background:#020617;color:#fff;font-size:14px}.section{grid-column:1/-1;margin-top:10px;padding-top:16px;border-top:1px solid #1e293b}small{color:#94a3b8}.ok{max-width:1100px;margin:0 auto 14px;background:#064e3b;color:#bbf7d0;padding:13px 16px;border-radius:14px}.preview{margin-top:8px;max-width:140px;max-height:90px;border-radius:10px;background:#111827;border:1px solid #334155}.full{grid-column:1/-1}.save{margin-top:20px;width:100%;font-size:16px;padding:15px}.hint{color:#94a3b8;margin-top:5px;font-size:13px}
+  </style>
+</head>
+<body>
+  <div class="top">
+    <h1>Dashboard Admin</h1>
+    <div class="actions">
+      <a class="btn gray" href="/" target="_blank">Lihat Website</a>
+      <form method="POST" action="/admin/logout"><button class="btn" type="submit">Logout</button></form>
+    </div>
+  </div>
+  <% if (success) { %><div class="ok">Berhasil disimpan.</div><% } %>
+  <form class="card" method="POST" action="/admin/save">
+    <div class="grid">
+      <div class="full">
+        <label>Judul Website</label>
+        <input name="siteTitle" value="<%= config.siteTitle %>">
+      </div>
+      <div>
+        <label>Foto CS / Logo Utama</label>
+        <input name="profilePhoto" value="<%= config.profilePhoto %>">
+        <div class="hint">Isi pakai link gambar PNG/JPG/WebP.</div>
+      </div>
+      <div>
+        <label>Alt Foto</label>
+        <input name="profileAlt" value="<%= config.profileAlt %>">
+      </div>
+      <div class="section"><h2>Background</h2><small>Desktop dan mobile bisa beda. Kosongkan mobile kalau mau ikut desktop.</small></div>
+      <div>
+        <label>Background Desktop</label>
+        <input name="backgroundDesktop" value="<%= config.backgroundDesktop %>">
+      </div>
+      <div>
+        <label>Background Mobile</label>
+        <input name="backgroundMobile" value="<%= config.backgroundMobile %>">
+      </div>
+      <div class="section"><h2>WhatsApp</h2></div>
+      <div><label>WhatsApp Official 1</label><input name="wa1" value="<%= config.wa1 %>"></div>
+      <div><label>WhatsApp Official 2</label><input name="wa2" value="<%= config.wa2 %>"></div>
+      <div><label>WhatsApp Official 3</label><input name="wa3" value="<%= config.wa3 %>"></div>
+      <div class="section"><h2>Telegram</h2></div>
+      <div><label>Telegram Official 1</label><input name="tg1" value="<%= config.tg1 %>"></div>
+      <div><label>Telegram Official 2</label><input name="tg2" value="<%= config.tg2 %>"></div>
+      <div class="section"><h2>LiveChat</h2></div>
+      <div><label>LiveChat Official 1</label><input name="lc1" value="<%= config.lc1 %>"></div>
+      <div><label>LiveChat Official 2</label><input name="lc2" value="<%= config.lc2 %>"></div>
+    </div>
+    <button class="btn save" type="submit">SIMPAN SEMUA PERUBAHAN</button>
+  </form>
+</body>
+</html>

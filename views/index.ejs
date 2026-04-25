@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title><%= config.siteTitle %></title>
+  <link rel="icon" type="image/png" href="/favicon.png">
+  <style>
+    :root{
+      --bg-desktop: <%= config.backgroundDesktop ? `url('${config.backgroundDesktop}')` : 'none' %>;
+      --bg-mobile: <%= config.backgroundMobile ? `url('${config.backgroundMobile}')` : (config.backgroundDesktop ? `url('${config.backgroundDesktop}')` : 'none') %>;
+    }
+    html {
+      background-color: #000;
+      background-image: var(--bg-desktop);
+      background-position: center center;
+      background-attachment: fixed !important;
+      background-size: cover !important;
+    }
+    @media (max-width: 600px) {
+      html { background-image: var(--bg-mobile); }
+    }
+    body {
+      font-family: sans-serif;
+      margin: 0;
+      padding: 15px;
+      padding-bottom: 80px;
+      background-color: #0000005c;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+    .wrap {
+      width: 100%;
+      max-width: 500px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 2;
+    }
+    .profile {
+      text-align: center;
+      color: #FFF;
+    }
+    .photo {
+      width: 247px;
+      max-width: 85%;
+      position: relative;
+      z-index: 1;
+    }
+    .link {
+      padding: 15px;
+      display: block;
+      background-color: rgba(0, 0, 0, 0.85);
+      text-align: center;
+      text-decoration: none;
+      transition: ease all 0.3s;
+      color: #FFF;
+      margin: 30px 0px;
+      border: 2px solid #fbff00;
+      animation: rainbow-border 4s linear infinite;
+      font-weight: bolder;
+      text-transform: uppercase;
+      border-bottom-right-radius: 15px;
+      border-top-left-radius: 15px;
+      z-index: 3;
+      position: relative;
+      box-shadow: 0px 0px 10px rgba(255,255,255,0.3);
+    }
+    .link:hover { opacity: 0.9; transform: translateY(-1px); }
+    .icon-img { width: 14px; margin-right: 5px; vertical-align: -2px; }
+    @keyframes rainbow-border {
+      0% { border-color: #0059ff; }
+      14% { border-color: #FFA500; }
+      28% { border-color: #0059ff; }
+      42% { border-color: #FFA500; }
+      57% { border-color: #FFFF00; }
+      71% { border-color: #0059ff; }
+      85% { border-color: #FFFF00; }
+      100% { border-color: #0059ff; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="profile">
+      <img src="<%= config.profilePhoto %>" class="photo" alt="<%= config.profileAlt %>">
+    </div>
+    <a id="wa1" class="link" href="<%= config.wa1 || '#' %>"><img src="/whatsapp.png" class="icon-img" alt=""> WHATSAPP OFFICIAL 1</a>
+    <a id="wa2" class="link" href="<%= config.wa2 || '#' %>"><img src="/whatsapp.png" class="icon-img" alt=""> WHATSAPP OFFICIAL 2</a>
+    <a id="wa3" class="link" href="<%= config.wa3 || '#' %>"><img src="/whatsapp.png" class="icon-img" alt=""> WHATSAPP OFFICIAL 3</a>
+    <a id="tg1" class="link" href="<%= config.tg1 || '#' %>"><img src="/telegram.png" class="icon-img" alt=""> TELEGRAM OFFICIAL 1</a>
+    <a id="tg2" class="link" href="<%= config.tg2 || '#' %>"><img src="/telegram.png" class="icon-img" alt=""> TELEGRAM OFFICIAL 2</a>
+    <a id="lc1" class="link" href="<%= config.lc1 || '#' %>"><img src="/livechat.png" class="icon-img" alt=""> LIVECHAT OFFICIAL 1</a>
+    <a id="lc2" class="link" href="<%= config.lc2 || '#' %>"><img src="/livechat.png" class="icon-img" alt=""> LIVECHAT OFFICIAL 2</a>
+  </div>
+  <script>
+    document.addEventListener("contextmenu", e => e.preventDefault());
+    document.addEventListener("keydown", e => {
+      if (e.key === "F12" || (e.ctrlKey && e.shiftKey && ["i", "j"].includes(e.key.toLowerCase())) || (e.ctrlKey && e.key.toLowerCase() === "u")) e.preventDefault();
+    });
+  </script>
+</body>
+</html>
