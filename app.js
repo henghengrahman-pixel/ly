@@ -17,7 +17,7 @@ const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'admin123';
 const SESSION_SECRET = process.env.SESSION_SECRET || 'change-this-secret-now';
 
 
-// ✅ FIX CONFIG (SUDAH SINKRON DENGAN EJS)
+// ✅ CONFIG FINAL + CHANNEL
 const DEFAULT_CONFIG = {
   siteTitle: 'CUSTOMER SERVICE OMTOGEL',
   profileAlt: 'CS OMTOGEL',
@@ -25,6 +25,9 @@ const DEFAULT_CONFIG = {
 
   background: '',
   background_mobile: '',
+
+  // 🔥 CHANNEL TELEGRAM (BARU)
+  channel: 'https://t.me/namachannel',
 
   wa1: 'https://wa.me/6280000000001',
   wa2: 'https://wa.me/6280000000002',
@@ -112,7 +115,7 @@ app.set('views', path.join(BASE_DIR, 'views'));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-// 🔥 NO CACHE (BIAR BACKGROUND LANGSUNG UPDATE)
+// 🔥 NO CACHE
 app.use((req, res, next) => {
   res.setHeader('Cache-Control', 'no-store');
   next();
